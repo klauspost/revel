@@ -29,6 +29,7 @@ var compressableMimes = [...]string{
 type WriteFlusher interface {
 	Write([]byte) (int, error)
 	Flush() error
+	Close() error
 }
 
 type CompressResponseWriter struct {
@@ -81,6 +82,7 @@ func (c *CompressResponseWriter) Write(b []byte) (int, error) {
 	}
 
 	if c.compressionType != "" {
+		defer c.compressWriter.Close()
 		defer c.compressWriter.Flush()
 		return c.compressWriter.Write(b)
 	} else {
